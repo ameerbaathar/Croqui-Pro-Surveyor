@@ -641,3 +641,10 @@ SE,12.59022609,53.83593335
 ---
 
 Made with care by Ameer Baathar
+
+<img width="1365" height="767" alt="c1" src="https://github.com/user-attachments/assets/fa7de6b5-fa48-4899-9058-22c5b4c21409" />
+
+<img width="1365" height="722" alt="c2" src="https://github.com/user-attachments/assets/8e432594-8a01-4891-86de-65e57c137b7f" />
+
+<img width="1365" height="767" alt="3c" src="https://github.com/user-attachments/assets/24180b81-ac5a-4800-8343-38903267b42f" />
+
