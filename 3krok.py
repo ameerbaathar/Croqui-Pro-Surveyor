@@ -2,6 +2,10 @@
 """
 Croqui Pro Surveyor - v9.3 (Final)
 ====================================
+👨‍💻 المبرمج والمطور: Ameer Baathar
+📧 © جميع الحقوق محفوظة - Ameer Baathar 2024-2025
+🔒 هذا البرنامج ملكية فكرية للمبرمج Ameer Baathar
+====================================
 - 💾 الكاش في D:\croqui_cache\ (ثابت)
 - 🔧 حفظ صحيح للتايلات (fsync + فحص)
 - 📊 تقارير تشخيص في terminal
@@ -14,6 +18,15 @@ Croqui Pro Surveyor - v9.3 (Final)
 التثبيت:
     pip install requests pillow matplotlib pyproj ezdxf
 """
+
+# ============================================================
+# © Ameer Baathar - All Rights Reserved
+# ============================================================
+DEVELOPER_NAME = "Ameer Baathar"
+DEVELOPER_TITLE = "المبرمج والمطور"
+COPYRIGHT_YEAR = "2024-2025"
+VERSION = "v9.3"
+_DEVELOPER_SIGNATURE = "AMEER_BAATHAR_CROQUI_PRO_V9.3_2024_2025"
 
 import io
 import os
@@ -46,6 +59,25 @@ import tkinter as tk
 from tkinter import ttk, filedialog, messagebox, colorchooser
 
 from pyproj import CRS, Transformer, Geod
+
+
+# ============================================================
+# 🔒 التحقق من حقوق المبرمج - لا تحذف هذا القسم
+# ============================================================
+def _verify_integrity():
+    """التحقق من سلامة حقوق المبرمج"""
+    required = [
+        DEVELOPER_NAME == "Ameer Baathar",
+        DEVELOPER_NAME in " ".join([str(DEVELOPER_NAME), VERSION]),
+        len(_DEVELOPER_SIGNATURE) > 10,
+    ]
+    if not all(required):
+        print("⚠️ تحذير: تم التلاعب بحقوق المبرمج!")
+        return False
+    return True
+
+
+_verify_integrity()
 
 
 # ============================================================
@@ -669,6 +701,7 @@ C_BORDER = "#c00000"
 C_TABLE_BORDER = "#333333"
 C_SEA = "#1a4d6e"
 C_ROAD = "#4a4a4a"
+C_DEVELOPER = "#f6a623"
 
 PIN_COLORS = ["#e31e24", "#2d6a4f", "#0066cc", "#f6a623"]
 PIN_NAMES_AR = ["شمال شرق", "شمال غرب", "جنوب غرب", "جنوب شرق"]
@@ -733,6 +766,8 @@ class CroquiDesigner:
             "license": "هيئة المهندسين",
             "logo_text": "مكتب الهندسة المساحية",
             "logo_sub": "رفع مساحي - تقسيم أراضي - كروكيات",
+            "developer": DEVELOPER_NAME,
+            "developer_title": DEVELOPER_TITLE,
         }
 
     def set_corners(self, corners):
@@ -1284,6 +1319,13 @@ class CroquiDesigner:
         ax.plot([cx - 0.08, cx + 0.08], [cy - 0.08, cy - 0.08],
                 color="#2b3a4a", lw=2,
                 transform=ax.transAxes, zorder=3)
+        # ✅ اسم المبرمج تحت الشعار الافتراضي
+        ax.text(cx, y0 + h * 0.04,
+                f"by {DEVELOPER_NAME}",
+                ha="center", va="center",
+                fontproperties=get_arabic_font(6.5), fontweight="bold",
+                color=C_DEVELOPER, transform=ax.transAxes, zorder=5,
+                style="italic")
 
     def _coords_table(self, ax, x0, y0, w, h):
         ax.add_patch(Rectangle((x0, y0), w, h, facecolor="white",
@@ -1367,6 +1409,7 @@ class CroquiDesigner:
             "2. الأبعاد محسوبة بدقة جيوديسية (WGS84).",
             "3. الحدود النهائية تتطلب تثبيت ميداني.",
             "4. المسؤولية القانونية على المالك.",
+            f"5. © {COPYRIGHT_YEAR} {DEVELOPER_NAME} — جميع الحقوق محفوظة.",
         ]
         txt = "\n".join(notes)
         ax.text(x0 + w - 0.01, y0 + h - th - 0.02, txt,
@@ -1412,6 +1455,14 @@ class CroquiDesigner:
                 fontproperties=get_arabic_font(8), fontweight="bold",
                 color="#1a1a1a", transform=ax.transAxes, zorder=4)
 
+        # ✅ اسم المبرمج أسفل لوحة المهندس
+        ax.text(x0 + w / 2, y0 + h * 0.06,
+                f"👨‍💻 {DEVELOPER_NAME}",
+                ha="center", va="center",
+                fontproperties=get_arabic_font(7), fontweight="bold",
+                color=C_DEVELOPER, transform=ax.transAxes, zorder=4,
+                style="italic")
+
     def build_figure(self, fig, dpi=150):
         fig.patch.set_facecolor("white")
         gs = GridSpec(2, 2, figure=fig,
@@ -1427,6 +1478,13 @@ class CroquiDesigner:
         self.draw_map(ax_map)
         self.draw_side_panel(ax_side)
         self.draw_bottom_panel(ax_bottom)
+
+        # ✅ توقيع المبرمج أسفل المخطط
+        fig.text(0.5, 0.001,
+                 f"© {COPYRIGHT_YEAR} {DEVELOPER_NAME} — All Rights Reserved  |  "
+                 f"Croqui Pro Surveyor {VERSION}",
+                 ha="center", va="bottom",
+                 fontsize=7, color="#999999", style="italic")
 
 
 # ============================================================
@@ -1447,6 +1505,7 @@ def export_dxf(path, corners_utm, epsg, measurements, site_info,
     doc.layers.add("POINTS", color=5)
     doc.layers.add("TEXT", color=7)
     doc.layers.add("AXIS", color=8)
+    doc.layers.add("DEVELOPER", color=2)  # ✅ طبقة المبرمج
 
     if corners_utm:
         ox = corners_utm[0][0]
@@ -1502,11 +1561,20 @@ def export_dxf(path, corners_utm, epsg, measurements, site_info,
             f"CRS: EPSG:{epsg} (WGS84 / UTM)",
             f"ENGINEER: {engineer}",
             f"DATE: {datetime.now().strftime('%Y-%m-%d')}",
+            f"SOFTWARE: Croqui Pro Surveyor {VERSION}",
+            f"DEVELOPER: {DEVELOPER_NAME}",
+            f"COPYRIGHT: (c) {COPYRIGHT_YEAR} {DEVELOPER_NAME}",
         ]
         for k, line in enumerate(info_lines):
             msp.add_text(line,
                           dxfattribs={"layer": "TEXT", "height": 1.5}
                           ).set_placement((min(xs), info_y - k * 3))
+
+        # ✅ طبقة DEVELOPER منفصلة
+        msp.add_text(
+            f"(c) {COPYRIGHT_YEAR} {DEVELOPER_NAME} - All Rights Reserved",
+            dxfattribs={"layer": "DEVELOPER", "height": 2.0}
+        ).set_placement((min(xs), info_y - len(info_lines) * 3 - 5))
 
     doc.saveas(path)
     return path
@@ -1616,12 +1684,12 @@ class ProgressWindow:
 class StartupDialog(tk.Toplevel):
     def __init__(self, parent):
         super().__init__(parent)
-        self.title("🚀 بدء مشروع جديد")
+        self.title(f"🚀 Croqui Pro Surveyor v9.3 — by {DEVELOPER_NAME}")
         self.configure(bg="white")
         self.resizable(False, False)
         self.result = None
 
-        w, h = 620, 580
+        w, h = 620, 630
         self.update_idletasks()
         sw = self.winfo_screenwidth()
         sh = self.winfo_screenheight()
@@ -1629,15 +1697,19 @@ class StartupDialog(tk.Toplevel):
         y = (sh - h) // 2
         self.geometry(f"{w}x{h}+{x}+{y}")
 
-        header = tk.Frame(self, bg="#1e3a5f", height=80)
+        header = tk.Frame(self, bg="#1e3a5f", height=105)
         header.pack(fill="x")
         header.pack_propagate(False)
         tk.Label(header, text="Croqui Pro Surveyor v9.3",
                  font=("Segoe UI", 18, "bold"),
-                 bg="#1e3a5f", fg="white").pack(pady=10)
+                 bg="#1e3a5f", fg="white").pack(pady=(10, 2))
         tk.Label(header, text="ابدأ مشروعك باختيار طريقة إدخال الأركان",
                  font=("Segoe UI", 10),
                  bg="#1e3a5f", fg="#b8c5d6").pack()
+        # ✅ اسم المبرمج
+        tk.Label(header, text=f"👨‍💻 تطوير: {DEVELOPER_NAME}",
+                 font=("Segoe UI", 9, "italic"),
+                 bg="#1e3a5f", fg=C_DEVELOPER).pack(pady=(3, 5))
 
         body = tk.Frame(self, bg="white", padx=30, pady=20)
         body.pack(fill="both", expand=True)
@@ -1695,6 +1767,12 @@ class StartupDialog(tk.Toplevel):
                  font=("Segoe UI", 8),
                  bg="white", fg="#888", wraplength=540,
                  justify="right").pack(pady=(10, 3))
+
+        # ✅ حقوق المبرمج
+        tk.Label(body,
+                 text=f"© {COPYRIGHT_YEAR} {DEVELOPER_NAME} — جميع الحقوق محفوظة",
+                 font=("Segoe UI", 8, "italic"),
+                 bg="white", fg="#999").pack(pady=(5, 3))
 
         cancel = tk.Button(body, text="❌ إلغاء",
                             font=("Segoe UI", 10),
@@ -1799,14 +1877,14 @@ class DraggableMarker:
 
 
 # ============================================================
-# InteractiveMapEditor - v9.3 (كل ضلع مستقل + سحب البحر/الطريق)
+# InteractiveMapEditor
 # ============================================================
 class InteractiveMapEditor(tk.Toplevel):
     def __init__(self, parent, initial_corners, designer_ref, on_confirm_cb,
                  initial_road=(False, "bottom", 0.12),
                  initial_sea=(False, "top", 0.12)):
         super().__init__(parent)
-        self.title("📍 محرر الأركان التفاعلي — Croqui Pro v9.3")
+        self.title(f"📍 محرر الأركان التفاعلي — Croqui Pro v9.3 by {DEVELOPER_NAME}")
         self.configure(bg="white")
         self.transient(parent)
 
@@ -1826,7 +1904,6 @@ class InteractiveMapEditor(tk.Toplevel):
         self.sat_img = None
         self.sat_bounds = None
 
-        # ✅ حالات الشارع والبحر مع الإزاحة
         self.has_road = tk.BooleanVar(value=initial_road[0])
         self.road_edge = tk.StringVar(value=initial_road[1])
         self.road_offset = initial_road[2] if len(initial_road) > 2 else 0.12
@@ -1835,8 +1912,7 @@ class InteractiveMapEditor(tk.Toplevel):
         self.sea_edge = tk.StringVar(value=initial_sea[1])
         self.sea_offset = initial_sea[2] if len(initial_sea) > 2 else 0.12
 
-        # ✅ متغيرات السحب
-        self._dragging_feature = None  # "road" أو "sea" أو None
+        self._dragging_feature = None
         self._drag_start_offset = 0
         self._drag_start_x = 0
         self._drag_start_y = 0
@@ -1866,6 +1942,11 @@ class InteractiveMapEditor(tk.Toplevel):
         tk.Label(top, text="📍 محرر الأركان التفاعلي v9.3",
                  font=("Segoe UI", 14, "bold"),
                  bg="#1e3a5f", fg="white").pack(side="left", padx=20)
+
+        # ✅ اسم المبرمج
+        tk.Label(top, text=f"by {DEVELOPER_NAME}",
+                 font=("Segoe UI", 9, "italic"),
+                 bg="#1e3a5f", fg=C_DEVELOPER).pack(side="left", padx=5)
 
         btn_frame = tk.Frame(top, bg="#1e3a5f")
         btn_frame.pack(side="right", padx=15)
@@ -2138,6 +2219,14 @@ class InteractiveMapEditor(tk.Toplevel):
 
         tk.Frame(coords_frame, bg="white", height=10).pack()
 
+        # ✅ حقوق المبرمج في اللوحة الجانبية
+        footer = tk.Frame(inner, bg="#f8f9fa")
+        footer.pack(fill="x", padx=12, pady=(5, 15))
+        tk.Label(footer,
+                 text=f"© {COPYRIGHT_YEAR} {DEVELOPER_NAME}",
+                 font=("Segoe UI", 8, "italic"),
+                 bg="#f8f9fa", fg=C_DEVELOPER).pack()
+
     def _load_map_async(self):
         pw = ProgressWindow(self, "🗺️ تحميل الخريطة", modal=False)
 
@@ -2261,6 +2350,21 @@ class InteractiveMapEditor(tk.Toplevel):
         self._draw_polygon()
         self._draw_axes_lines()
         self._draw_road_sea()
+
+        # ✅ توقيع المبرمج على الخريطة التفاعلية
+        try:
+            self.ax.text(0.99, 0.01,
+                         f"© {DEVELOPER_NAME}",
+                         ha="right", va="bottom",
+                         transform=self.ax.transAxes,
+                         fontsize=7, color="#ffffff",
+                         bbox=dict(boxstyle="round,pad=0.2",
+                                   facecolor="#1e3a5f", alpha=0.75,
+                                   edgecolor="none"),
+                         zorder=100)
+        except Exception:
+            pass
+
         self.canvas.draw_idle()
 
     def _draw_polygon(self):
@@ -2318,7 +2422,6 @@ class InteractiveMapEditor(tk.Toplevel):
         for lat, lon in self.corners:
             corner_merc.append(lonlat_to_webmercator(lon, lat))
 
-        # ✅ مسح بيانات السحب القديمة
         self._sea_poly_data = None
         self._road_poly_data = None
 
@@ -2379,7 +2482,6 @@ class InteractiveMapEditor(tk.Toplevel):
         self.ax.add_patch(poly)
         self._road_sea_artists.append(poly)
 
-        # ✅ احفظ بيانات السحب
         if is_sea:
             self._sea_poly_data = (p1, p2, a1, a2, nx, ny, L, edge, corner_merc)
         else:
@@ -2430,16 +2532,12 @@ class InteractiveMapEditor(tk.Toplevel):
 
         self.canvas.draw_idle()
 
-    # ==================================================
-    # ✅ on_press: نتحقق أولاً من البحر/الطريق للسحب
-    # ==================================================
     def _on_press(self, event):
         if event.inaxes != self.ax:
             return
         if event.xdata is None or event.ydata is None:
             return
 
-        # ✅ أولاً: هل النقرة على البحر أو الطريق؟ (للسحب)
         from matplotlib.path import Path as MplPath
         for feature_name in ["sea", "road"]:
             poly_data = getattr(self, f"_{feature_name}_poly_data", None)
@@ -2465,7 +2563,6 @@ class InteractiveMapEditor(tk.Toplevel):
                     pass
                 return
 
-        # ✅ وإلا: جرّب تحريك الأركان
         closest = None
         min_dist = float("inf")
         for m in self.markers:
@@ -2484,9 +2581,6 @@ class InteractiveMapEditor(tk.Toplevel):
             closest.set_highlight(True)
             self.canvas.draw_idle()
 
-    # ==================================================
-    # ✅ on_motion: سحب البحر/الطريق أو الأركان
-    # ==================================================
     def _on_motion(self, event):
         if event.inaxes != self.ax:
             return
@@ -2498,7 +2592,6 @@ class InteractiveMapEditor(tk.Toplevel):
             return
         self.last_update_time = now
 
-        # ✅ سحب البحر/الطريق
         if self._dragging_feature is not None:
             poly_data = getattr(self, f"_{self._dragging_feature}_poly_data", None)
             if poly_data is None:
@@ -2522,7 +2615,6 @@ class InteractiveMapEditor(tk.Toplevel):
             self.canvas.draw_idle()
             return
 
-        # ✅ سحب الأركان
         if self.active_marker is None:
             return
 
@@ -2540,9 +2632,6 @@ class InteractiveMapEditor(tk.Toplevel):
         self._update_coord_entries()
         self.canvas.draw_idle()
 
-    # ==================================================
-    # ✅ on_release: إنهاء السحب
-    # ==================================================
     def _on_release(self, event):
         if self._dragging_feature is not None:
             self._dragging_feature = None
@@ -2675,11 +2764,7 @@ class InteractiveMapEditor(tk.Toplevel):
             lon_var.set(f"{lon:.8f}")
         self._updating_entries = False
 
-    # ==================================================
-    # ✅ _on_length_change: كل ضلع مستقل تماماً
-    # ==================================================
     def _on_length_change(self, key, var):
-        """كل ضلع يعدل نقطة واحدة فقط — لا تعارض مع أي ضلع آخر"""
         if self._updating_entries:
             return
         try:
@@ -2689,21 +2774,11 @@ class InteractiveMapEditor(tk.Toplevel):
         except Exception:
             return
 
-        # ✅ خريطة الأضلاع المستقلة:
-        #   top    (P1↔P2): P1 ثابت → P2 يتحرك  (idx=1)
-        #   right  (P1↔P4): P1 ثابت → P4 يتحرك  (idx=3)
-        #   bottom (P3↔P4): P3 ثابت → P4 يتحرك  (idx=3)  ← لكن يتقاسم مع right
-        #   left   (P2↔P3): P2 ثابت → P3 يتحرك  (idx=2)
-        #
-        # ✅ لتفادي التعارض بين bottom و right:
-        #   bottom يستخدم anchor = P4, mover = P3
-        #   right  يستخدم anchor = P1, mover = P4
-        #   → كل واحد يحرك نقطة مختلفة (P3 و P4 على التوالي)
         edge_map = {
-            "top":    {"anchor": 0, "mover": 1},  # P1 → P2
-            "right":  {"anchor": 0, "mover": 3},  # P1 → P4
-            "bottom": {"anchor": 3, "mover": 2},  # P4 → P3
-            "left":   {"anchor": 1, "mover": 2},  # P2 → P3
+            "top":    {"anchor": 0, "mover": 1},
+            "right":  {"anchor": 0, "mover": 3},
+            "bottom": {"anchor": 3, "mover": 2},
+            "left":   {"anchor": 1, "mover": 2},
         }
         edge = edge_map[key]
         anchor_idx = edge["anchor"]
@@ -2798,7 +2873,7 @@ class InteractiveMapEditor(tk.Toplevel):
 class CroquiApp(tk.Tk):
     def __init__(self, initial_corners=None):
         super().__init__()
-        self.title("Croqui Pro Surveyor v9.3 — محرر تفاعلي متقدم")
+        self.title(f"Croqui Pro Surveyor {VERSION} — Developed by {DEVELOPER_NAME}")
         self.geometry("1500x950")
         self.minsize(1200, 800)
 
@@ -2861,8 +2936,13 @@ class CroquiApp(tk.Tk):
 
         ttk.Label(top, text="Croqui Pro Surveyor",
                   font=("Segoe UI", 16, "bold")).pack(side="left", padx=5)
-        ttk.Label(top, text="v9.3",
+        ttk.Label(top, text=VERSION,
                   font=("Segoe UI", 10)).pack(side="left", padx=10)
+
+        # ✅ اسم المبرمج في الشريط العلوي
+        ttk.Label(top, text=f"👨‍💻 {DEVELOPER_NAME}",
+                  font=("Segoe UI", 9, "italic"),
+                  foreground=C_DEVELOPER).pack(side="left", padx=5)
 
         ttk.Button(top, text="📐 تصدير DXF",
                    command=self.export_dxf_file).pack(side="right", padx=3)
@@ -3079,6 +3159,13 @@ class CroquiApp(tk.Tk):
         ttk.Label(frame, textvariable=self.status_var,
                   foreground="#0066cc", wraplength=440,
                   justify="right").pack(fill="x", pady=5)
+
+        # ✅ حقوق المبرمج في الشريط الجانبي
+        tk.Label(frame,
+                 text=f"© {COPYRIGHT_YEAR} {DEVELOPER_NAME} — جميع الحقوق محفوظة",
+                 font=("Segoe UI", 8, "italic"),
+                 fg=C_DEVELOPER, wraplength=440,
+                 justify="center").pack(fill="x", pady=(10, 15))
 
     def _build_preview(self, parent):
         self.fig = plt.Figure(figsize=(11, 8), dpi=80)
@@ -3400,6 +3487,13 @@ class CroquiApp(tk.Tk):
                 with PdfPages(path) as pdf:
                     pdf.savefig(fig, facecolor="white",
                                 bbox_inches="tight", pad_inches=0.1)
+                    # ✅ Metadata PDF
+                    d = pdf.infodict()
+                    d["Title"] = f"Croqui Pro Surveyor {VERSION}"
+                    d["Author"] = DEVELOPER_NAME
+                    d["Subject"] = "Croqui Surveying Document"
+                    d["Keywords"] = f"Croqui, Surveying, {DEVELOPER_NAME}"
+                    d["Creator"] = f"Croqui Pro Surveyor {VERSION} by {DEVELOPER_NAME}"
             else:
                 fig.savefig(path, dpi=300, facecolor="white",
                             bbox_inches="tight", pad_inches=0.1)
@@ -3440,6 +3534,11 @@ class CroquiApp(tk.Tk):
         if not path:
             return
         data = {
+            "software": "Croqui Pro Surveyor",
+            "version": VERSION,
+            "developer": DEVELOPER_NAME,
+            "copyright": f"© {COPYRIGHT_YEAR} {DEVELOPER_NAME}",
+            "saved_at": datetime.now().isoformat(),
             "corners": [(v[0].get(), v[1].get()) for v in self.corner_vars],
             "project": {k: v.get() for k, v in self.project_vars.items()},
             "road": {"has": self.has_road, "edge": self.road_edge,
@@ -3502,11 +3601,14 @@ class CroquiApp(tk.Tk):
 # نقطة الدخول
 # ============================================================
 def main():
-    print("=" * 60)
-    print("Croqui Pro Surveyor v9.3")
+    print("=" * 70)
+    print(f"  Croqui Pro Surveyor {VERSION}")
+    print(f"  👨‍💻 المبرمج: {DEVELOPER_NAME}")
+    print(f"  © {COPYRIGHT_YEAR} — جميع الحقوق محفوظة")
+    print("=" * 70)
     print(f"مجلد الكاش: {CACHE_DIR}")
     print(f"حجم الكاش الحالي: {get_cache_size():.2f} MB")
-    print("=" * 60)
+    print("=" * 70)
 
     root = tk.Tk()
     root.withdraw()
